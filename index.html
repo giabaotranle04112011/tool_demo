@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🎲 AI Probability Analyzer – VIP Edition (Có giọng nói AI + Biểu đồ)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --card: #131a2f;
+    --accent: #1e293b;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --orange: #f59e0b;
+    --purple: #a78bfa;
+    --blue: #3b82f6;
+    --yellow: #facc15;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 16px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0b0f1a 0%, #1e1b4b 100%);
+  }
+
+  h1 {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 24px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #a78bfa, #60a5fa, #22c55e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    border: 1px solid #2a3448;
+    transition: transform 0.2s;
+    position: relative;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .btn {
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+  }
+
+  .dark { background: var(--accent); color: var(--text); }
+  .red { background: var(--red); color: #fff; }
+  .green { background: var(--green); color: #fff; }
+  .orange { background: var(--orange); color: #fff; }
+  .purple { background: var(--purple); color: #fff; }
+  .blue { background: var(--blue); color: #fff; }
+  .yellow { background: var(--yellow); color: #000; }
+  .reset { background: #475569; color: #fff; }
+  .speak { background: linear-gradient(45deg, #22c55e, #16a34a); color: #fff; animation: pulse 2s infinite; }
+  .undo { background: #ef4444; color: #fff; }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    50% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  }
+
+  input, #quick3 {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    margin-top: 8px;
+    font-size: 16px;
+    background: var(--accent);
+    color: var(--text);
+    box-sizing: border-box;
+  }
+
+  input::placeholder, #quick3::placeholder {
+    color: var(--text-muted);
+  }
+
+  small {
+    color: var(--text-muted);
+    font-size: 14px;
+    display: block;
+    margin-top: 8px;
+  }
+
+  .guide {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid #3b82f6;
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 12px;
+    font-size: 14.5px;
+    line-height: 1.8;
+    display: none;
+  }
+
+  #hist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 8px;
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 12px;
+  }
+
+  #hist span {
+    display: inline-block;
+    background: var(--accent);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+  }
+
+  #hist span:hover {
+    transform: scale(1.02);
+    background: #475569;
+  }
+
+  #out {
+    white-space: pre-wrap;
+    line-height: 1.8;
+    font-size: 16px;
+    min-height: 120px;
+    background: var(--accent);
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 12px;
+    position: relative;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  #out.speaking {
+    border-color: var(--green);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.05);
+  }
+
+  #voiceControls {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    align-items: center;
+  }
+
+  .voice-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    flex: 1;
+  }
+
+  .voice-stop { background: var(--red); color: #fff; }
+  .voice-pause { background: var(--orange); color: #fff; }
+  .voice-speed { background: var(--purple); color: #fff; padding: 8px 16px; flex: none; }
+
+  .section-title {
+    font-weight: 600;
+    font-size: 17px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status {
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  .status-ai { background: rgba(167, 139, 250, 0.2); color: var(--purple); border: 1px solid var(--purple); }
+  .status-speaking { background: rgba(34, 197, 94, 0.2); color: var(--green); border: 1px solid var(--green); animation: pulse 1.5s infinite; }
+
+  #chartContainer {
+    margin-top: 16px;
+    background: var(--accent);
+    border-radius: 12px;
+    padding: 12px;
+    height: 300px;
+  }
+
+  #vipKey {
+    margin-top: 8px;
+  }
+
+  .vip-feature {
+    background: rgba(250, 204, 21, 0.1);
+    border: 1px solid var(--yellow);
+    padding: 8px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--yellow);
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @media (max-width: 600px) {
+    .btn, .voice-btn { min-width: 100%; }
+    .row { flex-direction: column; }
+    #voiceControls { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🎲 AI Probability Analyzer<br><small style="background:none;-webkit-text-fill-color:#94a3b8;font-size:16px">VIP Edition – Có giọng nói AI + Biểu đồ + Dự đoán nâng cao 🎙️📈</small></h1>
+
+<div class="card">
+  <div class="section-title">🔑 API Key OpenAI (tùy chọn)</div>
+  <input id="key" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+  <small>Không có key vẫn xem được thống kê cơ bản. Có key sẽ có phân tích AI + <b>tự động đọc to</b>.</small>
+</div>
+
+<div class="card hidden" id="vipSection">
+  <div class="section-title">⭐ VIP Key (Mở khóa tính năng cao cấp)</div>
+  <input id="vipKey" placeholder="Nhập VIP key để mở khóa (ví dụ: )">
+  <button class="btn yellow" onclick="unlockVIP()" style="width:100%;margin-top:8px">🔓 Mở khóa VIP</button>
+  <small>VIP: Biểu đồ nâng cao, dự đoán Markov, lưu tự động, chọn giọng nói...</small>
+</div>
+
+<div class="card">
+  <div class="section-title">➕ Nhập kết quả từng ván</div>
+  <div class="row" style="margin-top:16px">
+    <button class="btn dark" onclick="add('Long bảo xanh')">Long bảo xanh<br><small>Tay con thắng</small></button>
+    <button class="btn dark" onclick="add('Long bảo đỏ')">Long bảo đỏ<br><small>Nhà cái thắng</small></button>
+    <button class="btn green" onclick="add('Đôi xanh')">Đôi xanh<br><small>Tay con có đôi</small></button>
+    <button class="btn red" onclick="add('Đôi đỏ')">Đôi đỏ<br><small>Nhà cái có đôi</small></button>
+    <button class="btn orange" onclick="add('Hòa')">Hòa</button>
+  </div>
+
+  <div style="margin-top:28px">
+    <div class="section-title">⚡ Nhập nhanh nhiều ván cùng lúc</div>
+    <div class="row" style="align-items:flex-start">
+      <input id="quick3" placeholder="Ví dụ: Long bảo đỏ, Đôi xanh, Hòa">
+      <button class="btn purple" onclick="addQuick3()">➕ Thêm tất cả</button>
+    </div>
+    <small>Cách nhau bằng dấu phẩy. Có thể nhập 1, 2, 3 hay nhiều hơn đều được.</small>
+
+    <button class="btn blue" onclick="toggleGuide()" style="width:100%;margin-top:16px">📖 Xem danh sách tên cửa chuẩn để copy-paste</button>
+    <div id="guide" class="guide">
+      <b>Tên cửa chuẩn (copy đúng nguyên chữ nhé):</b><br><br>
+      • Long bảo xanh<br>
+      • Long bảo đỏ<br>
+      • Đôi xanh<br>
+      • Đôi đỏ<br>
+      • Hòa<br><br>
+      <b>Ví dụ chuỗi nhập nhanh:</b><br>
+      Long bảo đỏ, Đôi xanh, Hòa<br>
+      Long bảo xanh, Long bảo xanh, Đôi đỏ<br>
+      Hòa, Đôi đỏ, Long bảo xanh, Long bảo xanh
+    </div>
+  </div>
+
+  <div id="hist"></div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <button class="btn green speak" style="flex:2;font-size:17px" onclick="analyze()">🔮 Phân tích AI + <b>Tự động đọc to</b> 🎙️</button>
+    <button class="btn reset" onclick="resetAll()">🗑️ Reset</button>
+    <button class="btn undo" onclick="undoLast()">↩️ Undo</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">📊 Kết quả phân tích <span id="status"></span></div>
+  <div id="out"><small>👆 Nhập kết quả → bấm nút xanh để nghe AI phân tích bằng giọng nói! 🎙️</small></div>
+  
+  <div id="chartContainer" class="hidden">
+    <canvas id="statsChart"></canvas>
+  </div>
+  
+  <div id="voiceControls" style="display:none">
+    <button class="voice-btn voice-stop" onclick="stopSpeech()">⏹️ Dừng</button>
+    <button class="voice-btn voice-pause" onclick="toggleSpeech()">⏸️ Tạm dừng/Tiếp tục</button>
+    <select class="voice-btn voice-speed" id="voiceSpeed" onchange="changeSpeed()">
+      <option value="0.8">🐌 Chậm</option>
+      <option value="1.0" selected>🚶 Bình thường</option>
+      <option value="1.2">🐆 Nhanh</option>
+      <option value="1.5">⚡ Siêu nhanh</option>
+    </select>
+    <select class="voice-btn" id="voiceSelect" onchange="changeVoice()" style="background: var(--blue); color: #fff; flex: 2;">
+      <!-- Voices will be populated here -->
+    </select>
+  </div>
+  
+  <div class="vip-feature hidden" id="vipMarkov">⭐ VIP: Dự đoán Markov chain nâng cao...</div>
+</div>
+
+<script>
+let hist = [];
+let synth = window.speechSynthesis;
+let currentUtterance = null;
+let isPaused = false;
+let currentSpeed = 1.0;
+let selectedVoice = null;
+let isVIP = false;
+let chart = null;
+
+// Khởi tạo TTS và voices
+function initTTS() {
+  if ('speechSynthesis' in window) {
+    synth.onvoiceschanged = populateVoices;
+  }
+  loadHistory(); // Tải lịch sử từ localStorage
+  document.getElementById('vipSection').classList.remove('hidden');
+}
+
+function populateVoices() {
+  const voices = synth.getVoices();
+  const voiceSelect = document.getElementById('voiceSelect');
+  voiceSelect.innerHTML = '';
+  
+  const vietnameseVoices = voices.filter(voice => voice.lang.includes('vi'));
+  vietnameseVoices.forEach(voice => {
+    const option = document.createElement('option');
+    option.value = voice.name;
+    option.textContent = `${voice.name} (${voice.lang})`;
+    voiceSelect.appendChild(option);
+  });
+  
+  if (vietnameseVoices.length > 0) {
+    selectedVoice = vietnameseVoices[0];
+    voiceSelect.value = selectedVoice.name;
+  }
+}
+
+function changeVoice() {
+  const voices = synth.getVoices();
+  selectedVoice = voices.find(voice => voice.name === document.getElementById('voiceSelect').value);
+}
+
+function speak(text, auto = true) {
+  stopSpeech();
+  
+  if (!('speechSynthesis' in window)) return;
+
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.voice = selectedVoice || synth.getVoices().find(v => v.lang.includes('vi'));
+  currentUtterance.lang = 'vi-VN';
+  currentUtterance.rate = currentSpeed;
+  currentUtterance.pitch = 1.0;
+  currentUtterance.volume = 1.0;
+
+  currentUtterance.onstart = () => {
+    document.getElementById('out').classList.add('speaking');
+    document.getElementById('status').textContent = '🎙️ Đang đọc to...';
+    document.getElementById('status').className = 'status status-speaking';
+    document.getElementById('voiceControls').style.display = 'flex';
+  };
+
+  currentUtterance.onend = () => {
+    document.getElementById('out').classList.remove('speaking');
+    document.getElementById('status').textContent = '✅ Đã đọc xong';
+    document.getElementById('status').className = 'status status-ai';
+    setTimeout(() => document.getElementById('status').textContent = '', 3000);
+  };
+
+  currentUtterance.onpause = () => document.getElementById('status').textContent = '⏸️ Tạm dừng';
+  currentUtterance.onresume = () => document.getElementById('status').textContent = '▶️ Tiếp tục đọc...';
+  currentUtterance.onerror = (e) => {
+    console.error('Speech error:', e);
+    document.getElementById('status').textContent = '❌ Lỗi giọng nói';
+    document.getElementById('out').classList.remove('speaking');
+  };
+
+  synth.speak(currentUtterance);
+}
+
+function stopSpeech() {
+  synth.cancel();
+  document.getElementById('out').classList.remove('speaking');
+  document.getElementById('voiceControls').style.display = 'none';
+  document.getElementById('status').textContent = '';
+  isPaused = false;
+}
+
+function toggleSpeech() {
+  if (synth.speaking) {
+    if (isPaused) {
+      synth.resume();
+      isPaused = false;
+    } else {
+      synth.pause();
+      isPaused = true;
+    }
+  }
+}
+
+function changeSpeed() {
+  currentSpeed = parseFloat(document.getElementById('voiceSpeed').value);
+  if (currentUtterance) currentUtterance.rate = currentSpeed;
+}
+
+function add(v) {
+  hist.push(v);
+  saveHistory();
+  render();
+  speak(`${v} đã được thêm vào lịch sử!`, false);
+}
+
+function addQuick3() {
+  const input = document.getElementById("quick3");
+  const vals = input.value.split(",").map(s => s.trim()).filter(s => s);
+  if (vals.length === 0) {
+    alert("Chưa nhập gì cả! Hãy nhập ít nhất 1 kết quả.");
+    return;
+  }
+  vals.forEach(v => hist.push(v));
+  input.value = "";
+  saveHistory();
+  render();
+  speak(`Đã thêm ${vals.length} kết quả mới!`, false);
+}
+
+function undoLast() {
+  if (hist.length > 0) {
+    const removed = hist.pop();
+    saveHistory();
+    render();
+    speak(`Đã xóa ${removed} khỏi lịch sử!`, false);
+  } else {
+    alert("Không còn gì để undo!");
+  }
+}
+
+function toggleGuide() {
+  const g = document.getElementById("guide");
+  g.style.display = g.style.display === "none" ? "block" : "none";
+}
+
+function render() {
+  const h = document.getElementById("hist");
+  h.innerHTML = "";
+  hist.forEach((v, i) => {
+    const s = document.createElement("span");
+    s.textContent = (i + 1) + ". " + v;
+    s.title = `Ván ${i+1}: ${v}`;
+    h.appendChild(s);
+  });
+  if (hist.length === 0) {
+    h.innerHTML = "<small style='opacity:0.6;width:100%;text-align:center'>Chưa có dữ liệu nào...</small>";
+  }
+}
+
+function resetAll() {
+  if (hist.length === 0 || confirm("Bạn chắc muốn xóa hết dữ liệu?")) {
+    hist = [];
+    stopSpeech();
+    saveHistory();
+    render();
+    out("Đã reset toàn bộ dữ liệu. 👌");
+    if (chart) chart.destroy();
+    document.getElementById('chartContainer').classList.add('hidden');
+  }
+}
+
+function saveHistory() {
+  if (isVIP) localStorage.setItem('gameHistory', JSON.stringify(hist));
+}
+
+function loadHistory() {
+  if (isVIP) {
+    const saved = localStorage.getItem('gameHistory');
+    if (saved) {
+      hist = JSON.parse(saved);
+      render();
+    }
+  }
+}
+
+function unlockVIP() {
+  const vipInput = document.getElementById('vipKey').value.trim();
+  if (vipInput === 'admin123') { // Mẫu key VIP, có thể thay đổi
+    isVIP = true;
+    document.getElementById('vipSection').classList.add('hidden');
+    document.getElementById('vipMarkov').classList.remove('hidden');
+    document.getElementById('voiceSelect').parentElement.classList.remove('hidden');
+    alert('VIP unlocked! Tính năng cao cấp đã mở: Biểu đồ, lưu tự động, dự đoán Markov, chọn giọng nói.');
+    loadHistory();
+  } else {
+    alert('VIP key sai! Thử lại.');
+  }
+}
+
+function out(t, autoSpeak = false) {
+  document.getElementById("out").textContent = t;
+  if (autoSpeak) setTimeout(() => speak(t), 500);
+}
+
+function longestStreak() {
+  if (hist.length === 0) return null;
+  let maxStreak = 1, currentStreak = 1, maxItem = hist[0];
+  for (let i = 1; i < hist.length; i++) {
+    if (hist[i] === hist[i - 1]) {
+      currentStreak++;
+      if (currentStreak > maxStreak) {
+        maxStreak = currentStreak;
+        maxItem = hist[i];
+      }
+    } else {
+      currentStreak = 1;
+    }
+  }
+  return maxStreak > 1 ? { item: maxItem, length: maxStreak } : null;
+}
+
+function drawChart(cnt) {
+  const ctx = document.getElementById('statsChart').getContext('2d');
+  if (chart) chart.destroy();
+  
+  const labels = Object.keys(cnt);
+  const data = Object.values(cnt);
+  const colors = ['#22c55e', '#ef4444', '#86efac', '#f87171', '#f59e0b'];
+  
+  chart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'Phân bố kết quả' }
+      }
+    }
+  });
+  
+  document.getElementById('chartContainer').classList.remove('hidden');
+}
+
+function markovPrediction() {
+  if (hist.length < 2) return 'Không đủ dữ liệu cho dự đoán Markov.';
+  
+  const transitions = {};
+  const outcomes = ['Long bảo xanh', 'Long bảo đỏ', 'Đôi xanh', 'Đôi đỏ', 'Hòa'];
+  
+  outcomes.forEach(out => transitions[out] = {});
+  outcomes.forEach(out => outcomes.forEach(next => transitions[out][next] = 0));
+  
+  for (let i = 0; i < hist.length - 1; i++) {
+    transitions[hist[i]][hist[i+1]]++;
+  }
+  
+  const last = hist[hist.length - 1];
+  const probs = {};
+  let total = 0;
+  Object.keys(transitions[last]).forEach(next => {
+    total += transitions[last][next];
+  });
+  
+  if (total === 0) return 'Không có chuyển tiếp nào từ ' + last;
+  
+  Object.keys(transitions[last]).forEach(next => {
+    probs[next] = (transitions[last][next] / total * 100).toFixed(1) + '%';
+  });
+  
+  let msg = '⭐ VIP Markov Prediction (dựa trên chuyển tiếp):\nTừ ' + last + ', xác suất tiếp theo:\n';
+  Object.entries(probs).sort((a,b) => b[1]-a[1]).forEach(([k,v]) => msg += `• ${k}: ${v}\n`);
+  return msg;
+}
+
+function analyze() {
+  if (hist.length === 0) {
+    out("Chưa có dữ liệu nào. Hãy nhập ít nhất vài ván rồi bấm phân tích nhé! 😊");
+    return;
+  }
+
+  stopSpeech();
+
+  const cnt = {};
+  hist.forEach(v => cnt[v] = (cnt[v] || 0) + 1);
+  const total = hist.length;
+
+  let msg = "📊 THỐNG KÊ CHI TIẾT\n\n";
+  Object.keys(cnt).sort((a,b) => cnt[b] - cnt[a]).forEach(k => {
+    msg += `• ${k}: ${cnt[k]} lần (${(cnt[k]/total*100).toFixed(1)}%)\n`;
+  });
+
+  const recent5 = hist.slice(-5);
+  if (recent5.length > 0) {
+    msg += `\n📅 5 ván gần nhất:\n${recent5.join(" → ")}\n`;
+  }
+
+  const streak = longestStreak();
+  if (streak) {
+    msg += `\n🔥 Chuỗi dài nhất hiện tại:\n${streak.item} (${streak.length} lần liên tiếp)\n`;
+  }
+
+  const top = Object.entries(cnt).sort((a,b) => b[1]-a[1])[0][0];
+  msg += `\n🧠 GỢI Ý NHANH:\n`;
+  msg += `• Cửa đang hot nhất: ${top}\n`;
+  msg += `• Nhớ rằng: mọi trò chơi đều ngẫu nhiên, chỉ chơi vui và có trách nhiệm!\n`;
+
+  if (isVIP) {
+    drawChart(cnt);
+    msg += `\n${markovPrediction()}\n`;
+  }
+
+  document.getElementById('status').textContent = '🤖 Đang hỏi AI...';
+  document.getElementById('status').className = 'status status-ai';
+  out(msg, false);
+
+  const key = document.getElementById("key").value.trim();
+  if (!key) {
+    msg += `\n⚠️ Bạn đang xem thống kê thuần (không có AI).\nNhập API key để có phân tích sâu hơn + giọng nói AI nhé! 🎙️`;
+    if (isVIP) msg += `\nVIP đã mở, nhưng cần API key cho AI đầy đủ.`;
+    out(msg);
+    return;
+  }
+
+  fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + key
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      temperature: 0.6,
+      messages: [
+        {
+          role: "system",
+          content: `Bạn là chuyên gia phân tích trò chơi bài tùy chỉnh giống Baccarat.
+Các cửa: Long bảo xanh (Tay con thắng), Long bảo đỏ (Nhà cái thắng), Đôi xanh, Đôi đỏ, Hòa.
+Hãy phân tích lịch sử, xu hướng, chuỗi, tần suất một cách logic và thú vị.
+Gợi ý vui cho ván tiếp theo nếu thấy có cơ sở, nhưng luôn nhấn mạnh chơi có trách nhiệm và không có gì đảm bảo thắng.
+Viết ngắn gọn, dễ nghe khi đọc to (dưới 200 từ).`
+        },
+        {
+          role: "user",
+          content: `Lịch sử các ván (mới nhất ở cuối):\n${hist.join(" → ")}
+
+Phân tích xu hướng hiện tại và gợi ý cửa nào đáng cân nhắc cho ván tiếp theo (nếu có). Nhắc rõ rủi ro. Giữ ngắn gọn để dễ nghe.`
+        }
+      ]
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    const ai = d.choices?.[0]?.message?.content || "AI không trả lời được.";
+    const fullMsg = msg + "\n\n🤖 PHÂN TÍCH TỪ AI:\n\n" + ai;
+    out(fullMsg, true);
+  })
+  .catch(err => {
+    console.error(err);
+    const errorMsg = msg + "\n\n❌ Lỗi kết nối đến OpenAI.\nKiểm tra lại API key hoặc mạng của bạn.";
+    out(errorMsg);
+  });
+}
+
+// Khởi tạo
+initTTS();
+render();
+</script>
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>🎲 AI Probability Analyzer – Ultra VIP Pro 2026 Enhanced</title>
+<title>🎲 AI Probability Analyzer – Gemini 2.5 VIP Pro 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
@@ -202,17 +202,17 @@
 </head>
 <body>
 <h1>🎲 AI Probability Analyzer</h1>
-<small>Ultra VIP Pro 2026 Enhanced – Second-Order Markov + Import/Export + Advanced Stats 📈🎙️🔥</small>
+<small>Gemini 2.5 VIP Pro 2026 – Miễn phí Gemini 2.5 Flash + Second-Order Markov 📈🎙️🔥</small>
 
 <div class="card">
-  <div style="font-weight:600;margin-bottom:8px">🔑 API Key OpenAI (khuyến khích)</div>
-  <input id="key" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-  <small>Có key → phân tích AI siêu chi tiết + đọc to tự động. Key sẽ được lưu tự động. Không có vẫn dùng được thống kê + Markov (nếu VIP).</small>
+  <div style="font-weight:600;margin-bottom:8px">🔑 API Key Google Gemini (MIỄN PHÍ)</div>
+  <input id="key" placeholder="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
+  <small>Lấy key miễn phí tại: <a href="https://aistudio.google.com/app/api-keys" target="_blank" style="color:#60a5fa">aistudio.google.com/app/api-keys</a><br>Có key → phân tích Gemini 2.5 Flash siêu chi tiết + đọc to. Key lưu tự động.</small>
 </div>
 
 <div class="card" id="vipSection">
   <div style="font-weight:600;margin-bottom:8px">⭐ Mở khóa VIP (Second-order Markov + giọng nói nâng cao)</div>
-  <input id="vipKey" placeholder="Nhập key (ví dụ: admin123)">
+  <input id="vipKey" placeholder="Nhập key (admin123)">
   <button class="btn yellow" onclick="unlockVIP()" style="margin-top:12px">🔓 Mở khóa VIP</button>
 </div>
 
@@ -248,7 +248,7 @@
 <div class="card">
   <div class="row">
     <button id="analyzeBtn" class="btn green speak" style="flex:2;font-size:18px;position:relative" onclick="analyze()">
-      🔮 Phân tích AI + Đọc to 🎙️
+      🔮 Phân tích Gemini 2.5 AI + Đọc to 🎙️
     </button>
     <button class="btn reset" onclick="resetAll()">🗑️ Reset</button>
     <button class="btn undo" onclick="undoLast()">↩️ Undo</button>
@@ -302,7 +302,6 @@ let ttsReady = false;
 
 const outcomes = ['Long bảo xanh', 'Long bảo đỏ', 'Đôi xanh', 'Đôi đỏ', 'Hòa'];
 
-// TTS functions (giữ nguyên, chỉ thêm enableTTS an toàn)
 function enableTTS() {
   if (ttsReady) return;
   const utter = new SpeechSynthesisUtterance("");
@@ -398,7 +397,6 @@ function copyAnalysis() {
   });
 }
 
-// Import / Export / Copy History
 function copyHistory() {
   if (hist.length === 0) return alert('Chưa có dữ liệu để copy!');
   const text = hist.join(' → ');
@@ -434,7 +432,6 @@ function importHistory() {
   }
 }
 
-// Lịch sử
 function add(v) {
   if (!outcomes.includes(v)) return alert("Tên cửa không hợp lệ!");
   hist.push(v);
@@ -498,7 +495,6 @@ function render() {
     h.appendChild(s);
   });
 
-  // Streak hiện tại
   const stats = getStats();
   if (stats.total > 0) {
     streakInfo.textContent = `🔥 Streak hiện tại: ${stats.currentStreak} ván liên tiếp ${stats.streakType}`;
@@ -518,7 +514,6 @@ function loadHistory() {
   render();
 }
 
-// Thống kê
 function getStats() {
   const cnt = {
     'Long bảo xanh': 0,
@@ -533,7 +528,6 @@ function getStats() {
   const bankerWin = cnt['Long bảo đỏ'] + cnt['Đôi đỏ'];
   const tie = cnt['Hòa'];
 
-  // Current streak
   let currentStreak = 1;
   let streakType = hist[hist.length-1] || '';
   for (let i = hist.length-2; i >= 0; i--) {
@@ -541,7 +535,6 @@ function getStats() {
     else break;
   }
 
-  // Longest streak (cùng một cửa liên tiếp)
   let maxStreak = 1;
   if (total > 1) {
     let current = 1;
@@ -558,14 +551,12 @@ function getStats() {
   return { cnt, total, playerWin, bankerWin, tie, currentStreak, streakType, maxStreak };
 }
 
-// Second-order Markov (VIP)
 function markovPrediction() {
   if (hist.length < 3) return "⚠️ Cần ít nhất 3 ván để dự đoán Markov.";
   let text = "🔮 Dự đoán cửa tiếp theo (Second-order Markov - VIP Pro):\n";
   let predictions = [];
   let usedSecond = false;
 
-  // Second-order
   if (hist.length >= 6) {
     const transitions = {};
     for (let i = 0; i < hist.length - 2; i++) {
@@ -587,7 +578,6 @@ function markovPrediction() {
     }
   }
 
-  // Fallback to first-order
   if (!usedSecond) {
     text = "🔮 Dự đoán cửa tiếp theo (First-order Markov - fallback):\n";
     const transitions = {};
@@ -653,7 +643,6 @@ function drawChart(stats) {
   document.getElementById('chartContainer').style.display = 'block';
 }
 
-// Phân tích chính
 async function analyze() {
   if (hist.length === 0) return alert("Chưa có dữ liệu!");
 
@@ -672,7 +661,6 @@ async function analyze() {
   basicText += `🔥 Streak hiện tại: ${currentStreak} ván liên tiếp ${streakType}\n`;
   basicText += `🏆 Longest streak: ${maxStreak} ván liên tiếp\n`;
 
-  // Last 10 ván
   if (total >= 10) {
     const last10 = hist.slice(-10);
     const cnt10 = {'Long bảo xanh':0, 'Long bảo đỏ':0, 'Đôi xanh':0, 'Đôi đỏ':0, 'Hòa':0};
@@ -693,7 +681,6 @@ async function analyze() {
 
   let finalText = basicText;
 
-  // Markov VIP
   if (isVIP) {
     const markov = markovPrediction();
     finalText += "\n\n" + markov;
@@ -701,40 +688,30 @@ async function analyze() {
     document.getElementById('vipMarkov').classList.remove('hidden');
   }
 
-  // AI OpenAI
   const apiKey = document.getElementById('key').value.trim();
   if (apiKey) {
-    document.getElementById('out').textContent = "🤖 Đang hỏi AI OpenAI... vui lòng chờ vài giây";
+    document.getElementById('out').textContent = "🤖 Đang hỏi Gemini 2.5 Flash... chờ vài giây";
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const prompt = `Bạn là chuyên gia phân tích game Rồng Hổ (Dragon Tiger). Hãy phân tích lịch sử ${total} ván chơi sau (mới nhất ở cuối):\n${hist.join(' → ')}\n\nTìm xu hướng, streak, hot/cold, xu hướng 10 ván gần nhất, và đưa ra gợi ý cửa nên đánh tiếp theo kèm lý do thuyết phục, xác suất ước lượng. Sử dụng tiếng Việt, thêm emoji cho sinh động, ngắn gọn nhưng chi tiết và hấp dẫn.`;
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [{
-            role: "system",
-            content: "Bạn là chuyên gia phân tích game Rồng Hổ / Baccarat variant. Phân tích lịch sử ván chơi, tìm xu hướng, streak, hot/cold, last 10 ván, và đưa ra gợi ý cửa nên đánh tiếp theo kèm lý do thuyết phục. Sử dụng tiếng Việt, thêm emoji cho sinh động, ngắn gọn nhưng chi tiết và hấp dẫn."
-          }, {
-            role: "user",
-            content: `Lịch sử ${total} ván gần nhất (mới nhất ở cuối):\n${hist.join(' → ')}\n\nPhân tích chi tiết và đưa ra gợi ý mạnh nhất.`
-          }],
-          temperature: 0.7,
-          max_tokens: 600
+          contents: [{ parts: [{ text: prompt }] }]
         })
       });
 
       if (response.ok) {
         const data = await response.json();
-        const aiText = data.choices[0].message.content.trim();
+        const aiText = data.candidates[0].content.parts[0].text.trim();
         finalText = aiText + "\n\n---\n📊 Thống kê cơ bản:\n" + basicText;
       } else {
-        finalText += "\n\n⚠️ Lỗi gọi OpenAI (key sai hoặc hết quota). Chỉ dùng thống kê + Markov.";
+        const errorData = await response.json();
+        finalText += `\n\n⚠️ Lỗi Gemini: ${errorData.error?.message || 'Key sai hoặc rate limit'}. Chỉ dùng thống kê + Markov.`;
       }
     } catch (e) {
-      finalText += "\n\n⚠️ Không kết nối được OpenAI (lỗi mạng?). Chỉ dùng thống kê + Markov.";
+      finalText += "\n\n⚠️ Lỗi mạng khi gọi Gemini. Chỉ dùng thống kê + Markov.";
     }
   }
 
@@ -776,15 +753,14 @@ function resetAll() {
   }
 }
 
-// Khởi tạo
 window.onload = () => {
-  const savedKey = localStorage.getItem('openaiKey');
+  const savedKey = localStorage.getItem('geminiKey');
   if (savedKey) document.getElementById('key').value = savedKey;
 
   document.getElementById('key').addEventListener('blur', () => {
     const keyVal = document.getElementById('key').value.trim();
-    if (keyVal) localStorage.setItem('openaiKey', keyVal);
-    else localStorage.removeItem('openaiKey');
+    if (keyVal) localStorage.setItem('geminiKey', keyVal);
+    else localStorage.removeItem('geminiKey');
   });
 
   loadHistory();
